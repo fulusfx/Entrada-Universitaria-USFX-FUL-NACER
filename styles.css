@@ -1,0 +1,319 @@
+/* Variables CSS */
+:root {
+    --primary-color: #D4AF37; /* Dorado boliviano */
+    --secondary-color: #B22222; /* Rojo folklórico */
+    --accent-color: #228B22; /* Verde de la bandera */
+    --dark-color: #2C1810; /* Marrón oscuro */
+    --light-color: #FFF8DC; /* Crema suave */
+    --text-dark: #333333;
+    --text-light: #666666;
+    --background: #F8F6F0;
+    --shadow: rgba(212, 175, 55, 0.2);
+    --border-radius: 12px;
+    --transition: all 0.3s ease;
+}
+
+/* Reset y configuración base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--background) 0%, #F0EBE1 100%);
+    color: var(--text-dark);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px 0;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: var(--border-radius);
+    box-shadow: 0 8px 32px var(--shadow);
+    color: white;
+}
+
+.title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    letter-spacing: 2px;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+/* Main content */
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+    align-items: start;
+}
+
+/* Form section */
+.form-section {
+    background: white;
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 2px solid var(--primary-color);
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 1.1rem;
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #E0E0E0;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: var(--transition);
+    background: white;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+/* Upload area */
+.upload-area {
+    position: relative;
+    border: 3px dashed var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    background: linear-gradient(45deg, rgba(212, 175, 55, 0.05), rgba(178, 34, 34, 0.05));
+}
+
+.upload-area:hover {
+    border-color: var(--secondary-color);
+    background: linear-gradient(45deg, rgba(212, 175, 55, 0.1), rgba(178, 34, 34, 0.1));
+}
+
+.file-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.upload-content {
+    pointer-events: none;
+}
+
+.upload-icon {
+    width: 48px;
+    height: 48px;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.upload-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 8px;
+}
+
+.upload-hint {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+/* Canvas section */
+.canvas-section {
+    background: white;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 2px solid var(--accent-color);
+}
+
+.canvas-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.main-canvas {
+    width: 100%;
+    height: 600px;
+    border: 2px solid var(--dark-color);
+    border-radius: var(--border-radius);
+    cursor: move;
+    background: #f9f9f9;
+    display: block;
+}
+
+.canvas-controls {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.controls-hint {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+/* Download section */
+.download-section {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 36px;
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.download-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+}
+
+.download-btn:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.download-icon {
+    width: 24px;
+    height: 24px;
+}
+
+/* Responsive design */
+@media (max-width: 968px) {
+    .main-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .title {
+        font-size: 2.5rem;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 640px) {
+    .title {
+        font-size: 2rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+    
+    .form-section {
+        padding: 20px;
+    }
+    
+    .upload-area {
+        padding: 30px 15px;
+    }
+    
+    .main-canvas {
+        height: 400px;
+    }
+}
+
+/* Estados especiales */
+.upload-area.dragover {
+    border-color: var(--secondary-color);
+    background: rgba(178, 34, 34, 0.1);
+}
+
+.form-input.error,
+.form-select.error {
+    border-color: #ff4444;
+    background-color: rgba(255, 68, 68, 0.05);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-group {
+    animation: fadeIn 0.6s ease forwards;
+}
+
+.form-group:nth-child(1) { animation-delay: 0.1s; }
+.form-group:nth-child(2) { animation-delay: 0.2s; }
+.form-group:nth-child(3) { animation-delay: 0.3s; }
+.form-group:nth-child(4) { animation-delay: 0.4s; }
+
+/* Loading state */
+.loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
