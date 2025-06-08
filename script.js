@@ -462,7 +462,7 @@ function drawTextUnified(ctx, scaleFactor = 1) {
     let textY = 300 * scaleFactor; // 🔧 POSICIÓN VERTICAL - Subido 50px (era 350)
     
     // ✅ RESPONSIVE: Más espacio en móviles, normal en PC
-const isMobile = window.innerWidth < 768;
+const isMobile = window.innerWidth < 600;
 const lineHeight = isMobile ? 25 * scaleFactor : 15 * scaleFactor;
     
     ctx.textAlign = 'left';
