@@ -390,9 +390,9 @@ function updateCanvas() {
 }
 
 function drawText() {
-    const textX = 50; // Posición centrada a la izquierda
-    let textY = 100; // Posición inicial
-    const lineHeight = 40;
+    const textX = 20; // Posición centrada a la izquierda
+    let textY = 350; // Posición inicial
+    const lineHeight = 20;
     
     ctx.textAlign = 'left';
     
@@ -400,9 +400,9 @@ function drawText() {
     if (appState.fullName.trim()) {
         const names = appState.fullName.trim().split(' ');
         
-        ctx.font = 'bold 28px Arial';
+        ctx.font = 'bold 18px Arial';
         ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 0;
         ctx.fillStyle = '#FFFFFF';
         
         // Dibujar cada palabra en línea separada
@@ -414,13 +414,13 @@ function drawText() {
             textY += lineHeight;
         });
         
-        textY += 20; // Espacio extra
+        textY += 2; // Espacio extra
     }
     
     // Etiqueta "DANZA:"
-    ctx.font = 'bold 24px Arial';
+    ctx.font = 'bold 20px Arial';
     ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 0;
     ctx.fillStyle = '#FFD700'; // Amarillo
     
     ctx.strokeText('DANZA:', textX, textY);
@@ -430,7 +430,7 @@ function drawText() {
     // Nombre de la danza
     const danceText = getDanceText();
     if (danceText) {
-        ctx.font = 'bold 26px Arial';
+        ctx.font = 'bold 22px Arial';
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 3;
         ctx.fillStyle = '#FFFFFF';
@@ -443,7 +443,7 @@ function drawText() {
             const testLine = currentLine + (currentLine ? ' ' : '') + word;
             const metrics = ctx.measureText(testLine);
             
-            if (metrics.width > 300 && currentLine) {
+            if (metrics.width > 10 && currentLine) {
                 // Dibujar línea actual
                 ctx.strokeText(currentLine.toUpperCase(), textX, textY);
                 ctx.fillText(currentLine.toUpperCase(), textX, textY);
