@@ -668,7 +668,7 @@ let scrollInterval;
 function startAutoScroll() {
     autoScrollActive = true;
     const scrollDuration = 2000; // ✅ DURACIÓN: 2 segundos de scroll automático
-    const scrollDistance = document.body.scrollHeight; // ✅ SCROLL HASTA EL FINAL EXACTO
+    const scrollDistance = Math.max(document.body.scrollHeight - window.innerHeight - 100, 400); // ✅ SCROLL COMPLETO: Hasta el final de la página
     const startTime = Date.now();
     const startPosition = window.pageYOffset;
     
