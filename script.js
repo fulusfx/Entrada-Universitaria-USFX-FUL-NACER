@@ -651,3 +651,59 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300);
     });
 });
+
+// ✅ SCROLL AUTOMÁTICO AL CARGAR LA PÁGINA
+let autoScrollActive = false;
+let scrollInterval;
+
+function startAutoScroll() {
+    autoScrollActive = true;
+    const scrollDuration = 2000; // 2 segundos
+    const scrollDistance = 300; // Píxeles a desplazarse
+    const startTime = Date.now();
+    const startPosition = window.pageYOffset;
+    
+    scrollInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / scrollDuration, 1);
+        
+        // Función de easing suave
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+        const currentPosition = startPosition + (scrollDistance * easeProgress);
+        
+        window.scrollTo(0, currentPosition);
+        
+        // Detener después de 2 segundos
+        if (progress >= 1) {
+            stopAutoScroll();
+        }
+    }, 16); // 60 FPS
+}
+
+function stopAutoScroll() {
+    autoScrollActive = false;
+    if (scrollInterval) {
+        clearInterval(scrollInterval);
+    }
+}
+
+// ✅ DETECTAR INTERACCIÓN DEL USUARIO Y DETENER SCROLL
+function setupAutoScrollStop() {
+    const events = ['scroll', 'wheel', 'touchstart', 'mousedown', 'keydown'];
+    
+    events.forEach(event => {
+        window.addEventListener(event, () => {
+            if (autoScrollActive) {
+                stopAutoScroll();
+            }
+        }, { once: true, passive: true });
+    });
+}
+
+// ✅ INICIAR AL CARGAR LA PÁGINA
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        setupAutoScrollStop();
+        startAutoScroll();
+    }, 500); // Espera 0.5 segundos antes de empezar
+});
