@@ -458,7 +458,7 @@ function updateCanvas() {
 
 // ✅ FUNCIÓN UNIFICADA - Cualquier cambio aquí se aplica a pantalla Y descarga
 function drawTextUnified(ctx, scaleFactor = 1) {
-    const textX = 15 * scaleFactor; // 🔧 POSICIÓN HORIZONTAL - Modifica aquí
+    const textX = 10 * scaleFactor; // 🔧 POSICIÓN HORIZONTAL - Modifica aquí
     let textY = 300 * scaleFactor; // 🔧 POSICIÓN VERTICAL - Subido 50px (era 350)
     
     // ✅ RESPONSIVE: Más espacio en móviles, normal en PC
