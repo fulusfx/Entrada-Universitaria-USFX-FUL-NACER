@@ -653,9 +653,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // ✅ PASO 2: INICIAR SCROLL AUTOMÁTICO después de que se oculte el modal
             setTimeout(() => {
                 startAutoScroll();
-            }, 200); // ✅ Pequeña pausa antes de empezar el scroll
+            }, 10); // ✅ Pequeña pausa antes de empezar el scroll
             
-        }, 300); // ✅ Tiempo de animación del modal
+        }, 500); // ✅ Tiempo de animación del modal
     });
 });
 
@@ -668,7 +668,7 @@ let scrollInterval;
 function startAutoScroll() {
     autoScrollActive = true;
     const scrollDuration = 2000; // ✅ DURACIÓN: 2 segundos de scroll automático
-    const scrollDistance = 1000; // ✅ DISTANCIA: Píxeles a desplazarse hacia abajo
+    const scrollDistance = 10; // ✅ DISTANCIA: Píxeles a desplazarse hacia abajo
     const startTime = Date.now();
     const startPosition = window.pageYOffset;
     
