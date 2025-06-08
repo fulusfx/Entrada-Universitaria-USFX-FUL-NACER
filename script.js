@@ -458,9 +458,9 @@ function updateCanvas() {
 
 // ✅ FUNCIÓN UNIFICADA - Cualquier cambio aquí se aplica a pantalla Y descarga
 function drawTextUnified(ctx, scaleFactor = 1) {
-    const textX = 15 * scaleFactor; // 🔧 POSICIÓN HORIZONTAL - Modifica aquí
+    const textX = 30 * scaleFactor; // 🔧 POSICIÓN HORIZONTAL - Modifica aquí
     let textY = 300 * scaleFactor; // 🔧 POSICIÓN VERTICAL - Subido 50px (era 350)
-    const lineHeight = 30 * scaleFactor; // 🔧 ESPACIO ENTRE LÍNEAS - Reducido al 50% (era 35)
+    const lineHeight = 5 * scaleFactor; // 🔧 ESPACIO ENTRE LÍNEAS - Reducido al 50% (era 35)
     
     ctx.textAlign = 'left';
     
@@ -474,7 +474,7 @@ function drawTextUnified(ctx, scaleFactor = 1) {
     if (appState.fullName.trim()) {
         const names = appState.fullName.trim().split(' ');
         
-        ctx.font = `700 ${23 * scaleFactor}px Poppins, Arial`; // ✅ FUENTE POPPINS BOLD
+        ctx.font = `700 ${22 * scaleFactor}px Poppins, Arial`; // ✅ FUENTE POPPINS BOLD
         ctx.fillStyle = '#FFFFFF'; // ✅ COLOR BLANCO
         
         // Dibujar cada palabra en línea separada
@@ -496,7 +496,7 @@ function drawTextUnified(ctx, scaleFactor = 1) {
     // Nombre de la danza
     const danceText = getDanceText();
     if (danceText) {
-        ctx.font = `700 ${20 * scaleFactor}px Poppins, Arial`; // ✅ FUENTE POPPINS BOLD
+        ctx.font = `700 ${26 * scaleFactor}px Poppins, Arial`; // ✅ FUENTE POPPINS BOLD
         ctx.fillStyle = '#FFFFFF'; // ✅ COLOR BLANCO
         
         // ✅ CADA ESPACIO = NUEVA LÍNEA
