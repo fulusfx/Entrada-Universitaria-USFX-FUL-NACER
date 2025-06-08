@@ -146,80 +146,83 @@ body {
 }
 
 .form-group {
-    margin-bottom: 3px;
+    margin-bottom: 5px; /* ✅ SÚPER REDUCIDO: Espacio mínimo entre campos del formulario */
 }
 
 .form-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: var(--dark-color);
-    font-size: 1.1rem;
+    display: block; /* ✅ BLOQUE: Cada etiqueta ocupa toda la línea */
+    margin-bottom: 8px; /* ✅ ESPACIO: Separación entre etiqueta y campo */
+    font-weight: 600; /* ✅ PESO: Texto en semi-negrita para destacar */
+    color: var(--dark-color); /* ✅ COLOR: Color oscuro usando variable global */
+    font-size: 1.1rem; /* ✅ TAMAÑO: Ligeramente más grande que texto normal */
 }
 
 .form-input,
 .form-select {
-    width: 100%;
-    padding: 15px;
-    border: 2px solid #E0E0E0;
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    transition: var(--transition);
-    background: white;
+    width: 100%; /* ✅ ANCHO: Campos ocupan todo el ancho disponible */
+    padding: 15px; /* ✅ PADDING: Espacio interno cómodo para escribir */
+    border: 2px solid #E0E0E0; /* ✅ BORDE: Línea gris clara de 2px */
+    border-radius: var(--border-radius); /* ✅ ESQUINAS: Bordes redondeados usando variable */
+    font-size: 1rem; /* ✅ TAMAÑO FUENTE: Tamaño estándar legible */
+    transition: var(--transition); /* ✅ ANIMACIÓN: Transición suave para focus */
+    background: white; /* ✅ FONDO: Fondo blanco limpio */
 }
 
 .form-input:focus,
 .form-select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    outline: none; /* ✅ SIN OUTLINE: Elimina el borde azul por defecto del navegador */
+    border-color: var(--primary-color); /* ✅ BORDE FOCUS: Cambia a dorado cuando está activo */
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1); /* ✅ SOMBRA: Resplandor dorado sutil alrededor */
 }
 
-/* Upload area */
+/* ✅ ÁREA DE CARGA DE ARCHIVOS - Cuadro donde se arrastra/selecciona imagen */
 .upload-area {
-    position: relative;
-    border: 3px dashed var(--primary-color);
-    border-radius: var(--border-radius);
-    padding: 1px 3px;
-    text-align: center;
-    cursor: pointer;
-    transition: var(--transition);
-    background: linear-gradient(45deg, rgba(212, 175, 55, 0.05), rgba(178, 34, 34, 0.05));
+    position: relative; /* ✅ POSICIÓN: Permite posicionar elementos hijos de forma absoluta */
+    border: 3px dashed var(--primary-color); /* ✅ BORDE: Línea punteada dorada de 3px */
+    border-radius: var(--border-radius); /* ✅ ESQUINAS: Bordes redondeados usando variable global */
+    padding: 5px 5px; /* ✅ PADDING MÍNIMO: Espacio interno súper reducido (era 40px) */
+    text-align: center; /* ✅ ALINEACIÓN: Centra todo el contenido del cuadro */
+    cursor: pointer; /* ✅ CURSOR: Muestra manita al pasar mouse (indica clickeable) */
+    transition: var(--transition); /* ✅ ANIMACIÓN: Transición suave para hover usando variable */
+    background: linear-gradient(45deg, rgba(212, 175, 55, 0.05), rgba(178, 34, 34, 0.05)); /* ✅ FONDO: Degradado sutil dorado-rojo */
 }
 
 .upload-area:hover {
-    border-color: var(--secondary-color);
-    background: linear-gradient(45deg, rgba(212, 175, 55, 0.1), rgba(178, 34, 34, 0.1));
+    border-color: var(--secondary-color); /* ✅ HOVER BORDE: Cambia a color secundario (rojo) al pasar mouse */
+    background: linear-gradient(45deg, rgba(212, 175, 55, 0.1), rgba(178, 34, 34, 0.1)); /* ✅ HOVER FONDO: Degradado más intenso en hover */
 }
 
 .file-input {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
+    position: absolute; /* ✅ POSICIÓN: Se coloca encima del área de upload */
+    inset: 0; /* ✅ COBERTURA: Cubre toda el área del contenedor padre */
+    opacity: 0; /* ✅ INVISIBLE: Campo oculto visualmente pero funcional */
+    cursor: pointer; /* ✅ CURSOR: Manita para indicar que es clickeable */
 }
 
 .upload-content {
-    pointer-events: none;
+    pointer-events: none; /* ✅ SIN EVENTOS: Evita que el contenido interfiera con clicks del input */
 }
 
 .upload-icon {
-    width: 48px;
-    height: 48px;
-    color: var(--primary-color);
-    margin-bottom: 15px;
+    width: 24px; /* ✅ ICONO MÁS PEQUEÑO: Reducido de 48px a 24px */
+    height: 24px; /* ✅ ICONO MÁS PEQUEÑO: Reducido de 48px a 24px */
+    color: var(--primary-color); /* ✅ COLOR: Mantiene el color dorado principal */
+    margin-bottom: 5px; /* ✅ ESPACIO REDUCIDO: Menos espacio debajo del icono */
 }
 
 .upload-text {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--dark-color);
-    margin-bottom: 8px;
+    font-size: 1.2rem; /* ✅ TAMAÑO FUENTE: Texto principal del upload */
+    font-weight: 600; /* ✅ PESO FUENTE: Texto en negrita para destacar */
+    color: var(--dark-color); /* ✅ COLOR: Color oscuro para buena legibilidad */
+    margin-bottom: 2px; /* ✅ ESPACIO REDUCIDO: Menos espacio entre líneas de texto */
+    line-height: 1.1; /* ✅ ALTURA LÍNEA: Líneas más compactas entre sí */
 }
 
 .upload-hint {
-    color: var(--text-light);
-    font-size: 0.9rem;
+    color: var(--text-light); /* ✅ COLOR: Texto gris claro para información secundaria */
+    font-size: 0.9rem; /* ✅ TAMAÑO: Más pequeño que el texto principal */
+    line-height: 1.1; /* ✅ ALTURA LÍNEA: Líneas compactas para texto de ayuda */
+    margin-top: 0px; /* ✅ SIN MARGEN: Elimina espacio extra arriba */
 }
 
 /* Canvas section */
