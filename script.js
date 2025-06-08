@@ -400,7 +400,7 @@ function drawText() {
     if (appState.fullName.trim()) {
         const names = appState.fullName.trim().split(' ');
         
-        ctx.font = 'bold 18px Arial';
+        ctx.font = 'bold 30px Arial';
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 0;
         ctx.fillStyle = '#FFFFFF';
@@ -418,7 +418,7 @@ function drawText() {
     }
     
     // Etiqueta "DANZA:"
-    ctx.font = 'bold 20px Arial';
+    ctx.font = 'bold 30px Arial';
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 0;
     ctx.fillStyle = '#FFD700'; // Amarillo
@@ -430,7 +430,7 @@ function drawText() {
     // Nombre de la danza
     const danceText = getDanceText();
     if (danceText) {
-        ctx.font = 'bold 22px Arial';
+        ctx.font = 'bold 30px Arial';
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 3;
         ctx.fillStyle = '#FFFFFF';
@@ -562,9 +562,9 @@ function downloadImage() {
 }
 
 function drawTextOnCanvas(ctx, scaleFactor) {
-    const textX = 50 * scaleFactor;
-    let textY = 100 * scaleFactor;
-    const lineHeight = 40 * scaleFactor;
+    const textX = 20 * scaleFactor;
+    let textY = 350 * scaleFactor;
+    const lineHeight = 20 * scaleFactor;
     
     ctx.textAlign = 'left';
     
