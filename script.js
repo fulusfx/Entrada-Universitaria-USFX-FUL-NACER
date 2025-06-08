@@ -460,7 +460,9 @@ function updateCanvas() {
 function drawTextUnified(ctx, scaleFactor = 1) {
     const textX = 30 * scaleFactor; // 🔧 POSICIÓN HORIZONTAL - Modifica aquí
     let textY = 300 * scaleFactor; // 🔧 POSICIÓN VERTICAL - Subido 50px (era 350)
-    const lineHeight = 25 * scaleFactor; // 🔧 ESPACIO ENTRE LÍNEAS - Reducido al 50% (era 35)
+    // ✅ RESPONSIVE: Más espacio en móviles, normal en PC
+const isMobile = window.innerWidth < 768;
+const lineHeight = isMobile ? 32 * scaleFactor : 22 * scaleFactor;
     
     ctx.textAlign = 'left';
     
