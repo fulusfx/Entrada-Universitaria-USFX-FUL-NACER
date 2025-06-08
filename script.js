@@ -680,7 +680,7 @@ function startAutoScroll() {
         const progress = Math.min(elapsed / scrollDuration, 1);
         
         // ✅ ANIMACIÓN SUAVE: Función de easing para transición natural
-        const easeProgress = 1 - Math.pow(1 - progress, 3);
+        const easeProgress = Math.sin(progress * Math.PI / 2); // ✅ SÚPER SUAVE: Curva sinusoidal
         const currentPosition = startPosition + (scrollDistance * easeProgress);
         
         window.scrollTo(0, currentPosition);
@@ -689,7 +689,7 @@ function startAutoScroll() {
         if (progress >= 1) {
             stopAutoScroll();
         }
-    }, 16); // ✅ 60 FPS para animación fluida
+    }, 50); // ✅ 60 FPS para animación fluida
 }
 
 
