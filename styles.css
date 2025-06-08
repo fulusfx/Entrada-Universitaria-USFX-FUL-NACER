@@ -46,7 +46,7 @@ body {
 }
 
 .title {
-    font-size: 3rem; /* ✅ Reducido ligeramente para texto largo */
+    font-size: 4rem; /* ✅ Reducido ligeramente para texto largo */
     font-weight: 700;
     font-family: 'Anton', sans-serif; /* ✅ FUENTE ANTON */
     margin-bottom: 10px;
