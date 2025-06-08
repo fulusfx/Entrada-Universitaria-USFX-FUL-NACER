@@ -389,10 +389,11 @@ function updateCanvas() {
     drawText();
 }
 
-function drawText() {
-    const textX = 20; // Posición centrada a la izquierda
-    let textY = 350; // Posición inicial
-    const lineHeight = 20;
+// ✅ FUNCIÓN UNIFICADA - Cualquier cambio aquí se aplica a pantalla Y descarga
+function drawTextUnified(ctx, scaleFactor = 1) {
+    const textX = 30 * scaleFactor; // 🔧 POSICIÓN HORIZONTAL - Modifica aquí
+    let textY = 350 * scaleFactor; // 🔧 POSICIÓN VERTICAL - Modifica aquí  
+    const lineHeight = 30 * scaleFactor; // 🔧 ESPACIO ENTRE LÍNEAS - Modifica aquí
     
     ctx.textAlign = 'left';
     
@@ -400,10 +401,10 @@ function drawText() {
     if (appState.fullName.trim()) {
         const names = appState.fullName.trim().split(' ');
         
-        ctx.font = 'bold 30px Arial';
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 0;
-        ctx.fillStyle = '#FFFFFF';
+        ctx.font = `bold ${28 * scaleFactor}px Arial`; // 🔧 TAMAÑO NOMBRE - Modifica aquí
+        ctx.strokeStyle = '#000000'; // 🔧 COLOR BORDE - Modifica aquí
+        ctx.lineWidth = 3 * scaleFactor; // 🔧 GROSOR BORDE - Modifica aquí
+        ctx.fillStyle = '#FFFFFF'; // 🔧 COLOR NOMBRE - Modifica aquí
         
         // Dibujar cada palabra en línea separada
         names.forEach((name) => {
@@ -414,14 +415,14 @@ function drawText() {
             textY += lineHeight;
         });
         
-        textY += 2; // Espacio extra
+        textY += 20 * scaleFactor; // Espacio extra
     }
     
     // Etiqueta "DANZA:"
-    ctx.font = 'bold 30px Arial';
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 0;
-    ctx.fillStyle = '#FFD700'; // Amarillo
+    ctx.font = `bold ${24 * scaleFactor}px Arial`; // 🔧 TAMAÑO "DANZA:" - Modifica aquí
+    ctx.strokeStyle = '#000000'; // 🔧 COLOR BORDE - Modifica aquí
+    ctx.lineWidth = 3 * scaleFactor; // 🔧 GROSOR BORDE - Modifica aquí
+    ctx.fillStyle = '#FFD700'; // 🔧 COLOR "DANZA:" (Amarillo) - Modifica aquí
     
     ctx.strokeText('DANZA:', textX, textY);
     ctx.fillText('DANZA:', textX, textY);
@@ -430,10 +431,10 @@ function drawText() {
     // Nombre de la danza
     const danceText = getDanceText();
     if (danceText) {
-        ctx.font = 'bold 30px Arial';
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 3;
-        ctx.fillStyle = '#FFFFFF';
+        ctx.font = `bold ${26 * scaleFactor}px Arial`; // 🔧 TAMAÑO DANZA - Modifica aquí
+        ctx.strokeStyle = '#000000'; // 🔧 COLOR BORDE - Modifica aquí
+        ctx.lineWidth = 3 * scaleFactor; // 🔧 GROSOR BORDE - Modifica aquí
+        ctx.fillStyle = '#FFFFFF'; // 🔧 COLOR DANZA - Modifica aquí
         
         // Dividir texto largo en múltiples líneas
         const words = danceText.split(' ');
@@ -443,7 +444,7 @@ function drawText() {
             const testLine = currentLine + (currentLine ? ' ' : '') + word;
             const metrics = ctx.measureText(testLine);
             
-            if (metrics.width > 10 && currentLine) {
+            if (metrics.width > 300 * scaleFactor && currentLine) {
                 // Dibujar línea actual
                 ctx.strokeText(currentLine.toUpperCase(), textX, textY);
                 ctx.fillText(currentLine.toUpperCase(), textX, textY);
@@ -460,6 +461,11 @@ function drawText() {
             ctx.fillText(currentLine.toUpperCase(), textX, textY);
         }
     }
+}
+
+// Función para pantalla (usa función unificada)
+function drawText() {
+    drawTextUnified(ctx, 1);
 }
 
 function getDanceText() {
@@ -561,71 +567,9 @@ function downloadImage() {
     }, 'image/png');
 }
 
+f// Función para descarga (usa función unificada)
 function drawTextOnCanvas(ctx, scaleFactor) {
-    const textX = 20 * scaleFactor;
-    let textY = 350 * scaleFactor;
-    const lineHeight = 20 * scaleFactor;
-    
-    ctx.textAlign = 'left';
-    
-    // Nombre y apellido
-    if (appState.fullName.trim()) {
-        const names = appState.fullName.trim().split(' ');
-        
-        ctx.font = `bold ${28 * scaleFactor}px Arial`;
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 3 * scaleFactor;
-        ctx.fillStyle = '#FFFFFF';
-        
-        names.forEach((name) => {
-            ctx.strokeText(name.toUpperCase(), textX, textY);
-            ctx.fillText(name.toUpperCase(), textX, textY);
-            textY += lineHeight;
-        });
-        
-        textY += 20 * scaleFactor;
-    }
-    
-    // Etiqueta "DANZA:"
-    ctx.font = `bold ${24 * scaleFactor}px Arial`;
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 3 * scaleFactor;
-    ctx.fillStyle = '#FFD700';
-    
-    ctx.strokeText('DANZA:', textX, textY);
-    ctx.fillText('DANZA:', textX, textY);
-    textY += lineHeight;
-    
-    // Nombre de la danza
-    const danceText = getDanceText();
-    if (danceText) {
-        ctx.font = `bold ${26 * scaleFactor}px Arial`;
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 3 * scaleFactor;
-        ctx.fillStyle = '#FFFFFF';
-        
-        const words = danceText.split(' ');
-        let currentLine = '';
-        
-        words.forEach((word) => {
-            const testLine = currentLine + (currentLine ? ' ' : '') + word;
-            const metrics = ctx.measureText(testLine);
-            
-            if (metrics.width > 300 * scaleFactor && currentLine) {
-                ctx.strokeText(currentLine.toUpperCase(), textX, textY);
-                ctx.fillText(currentLine.toUpperCase(), textX, textY);
-                textY += lineHeight;
-                currentLine = word;
-            } else {
-                currentLine = testLine;
-            }
-        });
-        
-        if (currentLine) {
-            ctx.strokeText(currentLine.toUpperCase(), textX, textY);
-            ctx.fillText(currentLine.toUpperCase(), textX, textY);
-        }
-    }
+    drawTextUnified(ctx, scaleFactor);
 }
 
 // Event listeners adicionales para actualizar el botón de descarga
