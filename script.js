@@ -643,67 +643,95 @@ document.addEventListener('DOMContentLoaded', function() {
     // Mostrar modal al cargar
     introModal.style.display = 'flex';
     
-    // Ocultar modal al hacer clic
     introBtn.addEventListener('click', function() {
+        // ✅ PASO 1: Ocultar modal con animación
         introModal.classList.add('hidden');
+        
         setTimeout(() => {
             introModal.style.display = 'none';
-        }, 300);
+            
+            // ✅ PASO 2: INICIAR SCROLL AUTOMÁTICO después de que se oculte el modal
+            setTimeout(() => {
+                startAutoScroll();
+            }, 200); // ✅ Pequeña pausa antes de empezar el scroll
+            
+        }, 300); // ✅ Tiempo de animación del modal
     });
 });
 
-// ✅ SCROLL AUTOMÁTICO AL CARGAR LA PÁGINA
+
+// ✅ SCROLL AUTOMÁTICO - Variables globales
 let autoScrollActive = false;
 let scrollInterval;
 
+
 function startAutoScroll() {
     autoScrollActive = true;
-    const scrollDuration = 2000; // 2 segundos
-    const scrollDistance = 300; // Píxeles a desplazarse
+    const scrollDuration = 2000; // ✅ DURACIÓN: 2 segundos de scroll automático
+    const scrollDistance = 400; // ✅ DISTANCIA: Píxeles a desplazarse hacia abajo
     const startTime = Date.now();
     const startPosition = window.pageYOffset;
+    
+    // ✅ CONFIGURAR DETECCIÓN DE INTERACCIÓN ANTES DE EMPEZAR
+    setupAutoScrollStop();
     
     scrollInterval = setInterval(() => {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / scrollDuration, 1);
         
-        // Función de easing suave
+        // ✅ ANIMACIÓN SUAVE: Función de easing para transición natural
         const easeProgress = 1 - Math.pow(1 - progress, 3);
         const currentPosition = startPosition + (scrollDistance * easeProgress);
         
         window.scrollTo(0, currentPosition);
         
-        // Detener después de 2 segundos
+        // ✅ DETENER AUTOMÁTICAMENTE DESPUÉS DE 2 SEGUNDOS
         if (progress >= 1) {
             stopAutoScroll();
         }
-    }, 16); // 60 FPS
+    }, 16); // ✅ 60 FPS para animación fluida
 }
+
 
 function stopAutoScroll() {
     autoScrollActive = false;
     if (scrollInterval) {
         clearInterval(scrollInterval);
     }
+    // ✅ REMOVER LISTENERS PARA EVITAR ACUMULACIÓN
+    removeScrollStopListeners();
 }
 
-// ✅ DETECTAR INTERACCIÓN DEL USUARIO Y DETENER SCROLL
+
+// ✅ DETECTAR CUALQUIER INTERACCIÓN DEL USUARIO Y DETENER SCROLL
+let scrollStopListeners = [];
+
 function setupAutoScrollStop() {
-    const events = ['scroll', 'wheel', 'touchstart', 'mousedown', 'keydown'];
+    const events = [
+        'scroll',     // ✅ Usuario hace scroll manual
+        'wheel',      // ✅ Usuario usa rueda del mouse
+        'touchstart', // ✅ Usuario toca la pantalla (móvil)
+        'mousedown',  // ✅ Usuario presiona mouse
+        'keydown'     // ✅ Usuario presiona tecla
+    ];
     
     events.forEach(event => {
-        window.addEventListener(event, () => {
+        const listener = () => {
             if (autoScrollActive) {
                 stopAutoScroll();
             }
-        }, { once: true, passive: true });
+        };
+        
+        window.addEventListener(event, listener, { passive: true });
+        scrollStopListeners.push({ event, listener });
     });
 }
 
-// ✅ INICIAR AL CARGAR LA PÁGINA
-window.addEventListener('load', () => {
-    setTimeout(() => {
-        setupAutoScrollStop();
-        startAutoScroll();
-    }, 500); // Espera 0.5 segundos antes de empezar
-});
+function removeScrollStopListeners() {
+    scrollStopListeners.forEach(({ event, listener }) => {
+        window.removeEventListener(event, listener);
+    });
+    scrollStopListeners = [];
+}
+
+
