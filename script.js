@@ -1,578 +1,540 @@
-// Variables globales
-let userImage = null;
-let frameImage = null;
-let canvas = null;
-let ctx = null;
-let isDragging = false;
-let lastX = 0;
-let lastY = 0;
-let imageScale = 1;
-let imageX = 0;
-let imageY = 0;
-let canvasWidth = 600;
-let canvasHeight = 600;
-
-// Estado de la aplicación
-const appState = {
-    fullName: '',
-    selectedDance: '',
-    otherDance: '',
-    imageLoaded: false,
-    frameLoaded: false
-};
-
-// Inicialización cuando el DOM está listo
-document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
-});
-
-function initializeApp() {
-    // Obtener referencias a elementos del DOM
-    canvas = document.getElementById('mainCanvas');
-    ctx = canvas.getContext('2d');
-    
-    // Configurar canvas
-    setupCanvas();
-    
-    // Configurar event listeners
-    setupEventListeners();
-    
-    // Cargar el marco
-    loadFrameImage();
-    
-    console.log('Aplicación Danzarín inicializada correctamente');
+/* Variables CSS */
+:root {
+    --primary-color: #0c4d9b; /* Dorado boliviano */
+    --secondary-color: #B22222; /* Rojo folklórico */
+    --accent-color: #000000; /* Verde de la bandera */
+    --dark-color: #2C1810; /* Marrón oscuro */
+    --light-color: #FFF8DC; /* Crema suave */
+    --text-dark: #333333;
+    --text-light: #666666;
+    --background: #F8F6F0;
+    --shadow: rgba(212, 175, 55, 0.2);
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
 }
 
-function setupCanvas() {
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-    
-    // Dibujar fondo inicial
-    drawInitialCanvas();
+/* Reset y configuración base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-function setupEventListeners() {
-    // Formulario
-    const fullNameInput = document.getElementById('fullName');
-    const danceSelect = document.getElementById('danceSelect');
-    const otherDanceGroup = document.getElementById('otherDanceGroup');
-    const otherDanceInput = document.getElementById('otherDance');
-    const imageUpload = document.getElementById('imageUpload');
-    const uploadArea = document.getElementById('uploadArea');
-    const downloadBtn = document.getElementById('downloadBtn');
-
-    // Eventos del formulario
-    fullNameInput.addEventListener('input', function() {
-        appState.fullName = this.value;
-        updateCanvas();
-    });
-
-    danceSelect.addEventListener('change', function() {
-        const value = this.value;
-        appState.selectedDance = value;
-        
-        // Mostrar/ocultar campo "otro"
-        if (value === 'otro') {
-            otherDanceGroup.style.display = 'block';
-            otherDanceInput.required = true;
-        } else {
-            otherDanceGroup.style.display = 'none';
-            otherDanceInput.required = false;
-            appState.otherDance = '';
-        }
-        
-        updateCanvas();
-    });
-
-    otherDanceInput.addEventListener('input', function() {
-        appState.otherDance = this.value;
-        updateCanvas();
-    });
-
-    // Eventos de carga de imagen
-    imageUpload.addEventListener('change', handleImageUpload);
-    
-    // Drag and drop
-    uploadArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        this.classList.add('dragover');
-    });
-    
-    uploadArea.addEventListener('dragleave', function() {
-        this.classList.remove('dragover');
-    });
-    
-    uploadArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        this.classList.remove('dragover');
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            handleImageFile(files[0]);
-        }
-    });
-
-    // Eventos del canvas
-    setupCanvasEvents();
-
-    // Evento de descarga
-    downloadBtn.addEventListener('click', downloadImage);
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); /* ✅ FONDO OSCURO */
+    color: #ffffff; /* ✅ TEXTO BLANCO */
+    line-height: 1.6;
+    min-height: 100vh;
 }
 
-function setupCanvasEvents() {
-    // Mouse events
-    canvas.addEventListener('mousedown', startDrag);
-    canvas.addEventListener('mousemove', drag);
-    canvas.addEventListener('mouseup', endDrag);
-    canvas.addEventListener('mouseleave', endDrag);
-    canvas.addEventListener('wheel', handleZoom);
-
-    // Touch events para móvil
-    canvas.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        const touch = e.touches[0];
-        const mouseEvent = new MouseEvent('mousedown', {
-            clientX: touch.clientX,
-            clientY: touch.clientY
-        });
-        canvas.dispatchEvent(mouseEvent);
-    });
-
-    canvas.addEventListener('touchmove', function(e) {
-        e.preventDefault();
-        const touch = e.touches[0];
-        const mouseEvent = new MouseEvent('mousemove', {
-            clientX: touch.clientX,
-            clientY: touch.clientY
-        });
-        canvas.dispatchEvent(mouseEvent);
-    });
-
-    canvas.addEventListener('touchend', function(e) {
-        e.preventDefault();
-        const mouseEvent = new MouseEvent('mouseup', {});
-        canvas.dispatchEvent(mouseEvent);
-    });
-
-    // Gestos de zoom en móvil
-    let initialDistance = 0;
-    let initialScale = 1;
-
-    canvas.addEventListener('touchstart', function(e) {
-        if (e.touches.length === 2) {
-            e.preventDefault();
-            const touch1 = e.touches[0];
-            const touch2 = e.touches[1];
-            initialDistance = Math.hypot(
-                touch2.clientX - touch1.clientX,
-                touch2.clientY - touch1.clientY
-            );
-            initialScale = imageScale;
-        }
-    });
-
-    canvas.addEventListener('touchmove', function(e) {
-        if (e.touches.length === 2) {
-            e.preventDefault();
-            const touch1 = e.touches[0];
-            const touch2 = e.touches[1];
-            const currentDistance = Math.hypot(
-                touch2.clientX - touch1.clientX,
-                touch2.clientY - touch1.clientY
-            );
-            
-            const scale = (currentDistance / initialDistance) * initialScale;
-            imageScale = Math.max(0.1, Math.min(5, scale));
-            updateCanvas();
-        }
-    });
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-function handleImageUpload(e) {
-    const file = e.target.files[0];
-    if (file) {
-        handleImageFile(file);
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px 0;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: var(--border-radius);
+    box-shadow: 0 8px 32px var(--shadow);
+    color: white;
+}
+
+.title {
+    font-size: 3rem; /* ✅ Reducido ligeramente para texto largo */
+    font-weight: 700;
+    font-family: 'Anton', sans-serif; /* ✅ FUENTE ANTON */
+    margin-bottom: 10px;
+    letter-spacing: 1.5px; /* ✅ Espaciado reducido */
+    color: #FFFFFF; /* ✅ COLOR BLANCO SIMPLE */
+    line-height: 1.1; /* ✅ Líneas más compactas */
+    text-align: center;
+    /* ✅ SIN GRADIENTE, SIN RESPLANDOR, SIN EFECTOS */
+}
+
+/* Fallback específico para navegadores móviles que no soportan gradiente en texto */
+@supports not (-webkit-background-clip: text) {
+    .title {
+        background: none;
+        color: #FF0000;
+        text-shadow: 
+            2px 2px 0px #0066CC,
+            4px 4px 8px rgba(0,0,0,0.5);
     }
 }
 
-function handleImageFile(file) {
-    // Validar tipo de archivo
-    if (!file.type.startsWith('image/')) {
-        alert('Por favor, selecciona un archivo de imagen válido.');
-        return;
+/* ✅ CONTADORES PEQUEÑOS Y SIMPLES */
+.stats-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 8px 0;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    opacity: 1;
+}
+
+.stat-icon {
+    width: 12px;
+    height: 12px;
+    color: #FFD700;
+}
+
+.stat-number {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+}
+
+/* ✅ ANIMACIÓN CUANDO SE ACTUALIZA EL CONTADOR */
+.stat-number.updated {
+    color: #FFD700;
+}
+
+.stat-item.pulse {
+    animation: pulse 0.4s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    font-weight: 300;
+    padding: 0 20px;           /* Añadir padding lateral */
+    text-align: center;        /* Centrar texto */
+    line-height: 1.4;          /* Mejor espaciado entre líneas */
+    max-width: 90%;            /* Limitar ancho máximo */
+    margin: 0 auto;            /* Centrar elemento */
+}
+
+/* Main content */
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+    align-items: start;
+}
+
+/* Form section */
+.form-section {
+    background: white;
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 2px solid var(--primary-color);
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 1.1rem;
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #E0E0E0;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: var(--transition);
+    background: white;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+/* Upload area */
+.upload-area {
+    position: relative;
+    border: 3px dashed var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    background: linear-gradient(45deg, rgba(212, 175, 55, 0.05), rgba(178, 34, 34, 0.05));
+}
+
+.upload-area:hover {
+    border-color: var(--secondary-color);
+    background: linear-gradient(45deg, rgba(212, 175, 55, 0.1), rgba(178, 34, 34, 0.1));
+}
+
+.file-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.upload-content {
+    pointer-events: none;
+}
+
+.upload-icon {
+    width: 48px;
+    height: 48px;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.upload-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 8px;
+}
+
+.upload-hint {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+/* Canvas section */
+.canvas-section {
+    background: white;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 2px solid var(--accent-color);
+}
+
+.canvas-container {
+    position: relative; /* ✅ NECESARIO PARA POSICIONAR EL BOTÓN */
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.main-canvas {
+    width: 100%;
+    aspect-ratio: 1;
+    max-height: 600px;
+    border: 2px solid var(--dark-color);
+    border-radius: var(--border-radius);
+    cursor: move;
+    background: #f9f9f9;
+    display: block;
+}
+
+.canvas-controls {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.controls-hint {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+/* Download button */
+.download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 36px;
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    width: 100%; /* ✅ ANCHO COMPLETO EN EL FORMULARIO */
+}
+
+.download-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+}
+
+.download-btn:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.download-icon {
+    width: 24px;
+    height: 24px;
+}
+
+/* Responsive design */
+@media (max-width: 968px) {
+    .main-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
     }
-
-    // Validar tamaño (10MB máximo)
-    if (file.size > 10 * 1024 * 1024) {
-        alert('El archivo es demasiado grande. Por favor, selecciona una imagen menor a 10MB.');
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-            userImage = img;
-            appState.imageLoaded = true;
-            
-            // Centrar y ajustar la imagen
-            resetImagePosition();
-            updateCanvas();
-            updateDownloadButton();
-            
-            console.log('Imagen cargada correctamente:', img.width, 'x', img.height);
-        };
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-}
-
-function loadFrameImage() {
-    const img = new Image();
-    img.onload = function() {
-        frameImage = img;
-        appState.frameLoaded = true;
-        updateCanvas();
-        console.log('Marco cargado correctamente');
-    };
-    img.onerror = function() {
-        console.error('Error al cargar el marco');
-        // Crear un marco simple si no se puede cargar
-        createSimpleFrame();
-    };
-    img.src = 'assets/marco.png';
-}
-
-function createSimpleFrame() {
-    // Crear un canvas temporal para dibujar un marco simple
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = 600;
-    tempCanvas.height = 600;
-    const tempCtx = tempCanvas.getContext('2d');
     
-    // Dibujar marco dorado simple
-    tempCtx.strokeStyle = '#D4AF37';
-    tempCtx.lineWidth = 20;
-    tempCtx.strokeRect(10, 10, 580, 580);
-    
-    // Añadir decoraciones
-    tempCtx.strokeStyle = '#B22222';
-    tempCtx.lineWidth = 5;
-    tempCtx.strokeRect(25, 25, 550, 550);
-    
-    // Convertir a imagen
-    frameImage = new Image();
-    frameImage.onload = function() {
-        appState.frameLoaded = true;
-        updateCanvas();
-    };
-    frameImage.src = tempCanvas.toDataURL();
-}
-
-function resetImagePosition() {
-    if (!userImage) return;
-    
-    // Calcular escala para ajustar la imagen al canvas
-    const scaleX = canvasWidth / userImage.width;
-    const scaleY = canvasHeight / userImage.height;
-    imageScale = Math.min(scaleX, scaleY) * 0.8; // 80% del tamaño para dejar espacio
-    
-    // Centrar la imagen
-    imageX = (canvasWidth - userImage.width * imageScale) / 2;
-    imageY = (canvasHeight - userImage.height * imageScale) / 2;
-}
-
-function startDrag(e) {
-    if (!userImage) return;
-    
-    isDragging = true;
-    const rect = canvas.getBoundingClientRect();
-    lastX = e.clientX - rect.left;
-    lastY = e.clientY - rect.top;
-    canvas.style.cursor = 'grabbing';
-}
-
-function drag(e) {
-    if (!isDragging || !userImage) return;
-    
-    const rect = canvas.getBoundingClientRect();
-    const currentX = e.clientX - rect.left;
-    const currentY = e.clientY - rect.top;
-    
-    const deltaX = currentX - lastX;
-    const deltaY = currentY - lastY;
-    
-    imageX += deltaX;
-    imageY += deltaY;
-    
-    lastX = currentX;
-    lastY = currentY;
-    
-    updateCanvas();
-}
-
-function endDrag() {
-    isDragging = false;
-    canvas.style.cursor = 'move';
-}
-
-function handleZoom(e) {
-    if (!userImage) return;
-    
-    e.preventDefault();
-    
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    
-    const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-    const newScale = imageScale * zoomFactor;
-    
-    // Limitar el zoom
-    if (newScale >= 0.1 && newScale <= 5) {
-        // Ajustar posición para zoom centrado en el mouse
-        imageX = mouseX - (mouseX - imageX) * zoomFactor;
-        imageY = mouseY - (mouseY - imageY) * zoomFactor;
-        imageScale = newScale;
-        
-        updateCanvas();
-    }
-}
-
-function drawInitialCanvas() {
-    // Limpiar canvas
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-    
-    // Fondo degradado
-    const gradient = ctx.createLinearGradient(0, 0, canvasWidth, canvasHeight);
-    gradient.addColorStop(0, '#F8F6F0');
-    gradient.addColorStop(1, '#E8E6E0');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-    
-    // Texto de instrucciones
-    ctx.fillStyle = '#666666';
-    ctx.font = '20px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('Carga tu imagen para comenzar', canvasWidth / 2, canvasHeight / 2);
-}
-
-function updateCanvas() {
-    // Limpiar canvas
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-    
-    // Fondo
-    const gradient = ctx.createLinearGradient(0, 0, canvasWidth, canvasHeight);
-    gradient.addColorStop(0, '#F8F6F0');
-    gradient.addColorStop(1, '#E8E6E0');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-    
-    // Dibujar imagen del usuario si está cargada
-    if (userImage && appState.imageLoaded) {
-        ctx.save();
-        ctx.drawImage(
-            userImage,
-            imageX,
-            imageY,
-            userImage.width * imageScale,
-            userImage.height * imageScale
-        );
-        ctx.restore();
+    .title {
+        font-size: 2rem; /* ✅ Reducido para texto más largo */
     }
     
-    // Dibujar marco si está cargado
-    if (frameImage && appState.frameLoaded) {
-        ctx.drawImage(frameImage, 0, 0, canvasWidth, canvasHeight);
-    }
-    
-    // Dibujar texto
-    drawText();
-}
-
-// ✅ FUNCIÓN UNIFICADA - Cualquier cambio aquí se aplica a pantalla Y descarga
-function drawTextUnified(ctx, scaleFactor = 1) {
-    const textX = 30 * scaleFactor; // 🔧 POSICIÓN HORIZONTAL - Modifica aquí
-    let textY = 350 * scaleFactor; // 🔧 POSICIÓN VERTICAL - Modifica aquí  
-    const lineHeight = 30 * scaleFactor; // 🔧 ESPACIO ENTRE LÍNEAS - Modifica aquí
-    
-    ctx.textAlign = 'left';
-    
-    // Nombre y apellido
-    if (appState.fullName.trim()) {
-        const names = appState.fullName.trim().split(' ');
-        
-        ctx.font = `bold ${28 * scaleFactor}px Arial`; // 🔧 TAMAÑO NOMBRE - Modifica aquí
-        ctx.strokeStyle = '#000000'; // 🔧 COLOR BORDE - Modifica aquí
-        ctx.lineWidth = 3 * scaleFactor; // 🔧 GROSOR BORDE - Modifica aquí
-        ctx.fillStyle = '#FFFFFF'; // 🔧 COLOR NOMBRE - Modifica aquí
-        
-        // Dibujar cada palabra en línea separada
-        names.forEach((name) => {
-            // Contorno negro
-            ctx.strokeText(name.toUpperCase(), textX, textY);
-            // Texto blanco
-            ctx.fillText(name.toUpperCase(), textX, textY);
-            textY += lineHeight;
-        });
-        
-        textY += 20 * scaleFactor; // Espacio extra
-    }
-    
-    // Etiqueta "DANZA:"
-    ctx.font = `bold ${24 * scaleFactor}px Arial`; // 🔧 TAMAÑO "DANZA:" - Modifica aquí
-    ctx.strokeStyle = '#000000'; // 🔧 COLOR BORDE - Modifica aquí
-    ctx.lineWidth = 3 * scaleFactor; // 🔧 GROSOR BORDE - Modifica aquí
-    ctx.fillStyle = '#FFD700'; // 🔧 COLOR "DANZA:" (Amarillo) - Modifica aquí
-    
-    ctx.strokeText('DANZA:', textX, textY);
-    ctx.fillText('DANZA:', textX, textY);
-    textY += lineHeight;
-    
-    // Nombre de la danza
-    const danceText = getDanceText();
-    if (danceText) {
-        ctx.font = `bold ${26 * scaleFactor}px Arial`; // 🔧 TAMAÑO DANZA - Modifica aquí
-        ctx.strokeStyle = '#000000'; // 🔧 COLOR BORDE - Modifica aquí
-        ctx.lineWidth = 3 * scaleFactor; // 🔧 GROSOR BORDE - Modifica aquí
-        ctx.fillStyle = '#FFFFFF'; // 🔧 COLOR DANZA - Modifica aquí
-        
-        // Dividir texto largo en múltiples líneas
-        const words = danceText.split(' ');
-        let currentLine = '';
-        
-        words.forEach((word) => {
-            const testLine = currentLine + (currentLine ? ' ' : '') + word;
-            const metrics = ctx.measureText(testLine);
-            
-            if (metrics.width > 300 * scaleFactor && currentLine) {
-                // Dibujar línea actual
-                ctx.strokeText(currentLine.toUpperCase(), textX, textY);
-                ctx.fillText(currentLine.toUpperCase(), textX, textY);
-                textY += lineHeight;
-                currentLine = word;
-            } else {
-                currentLine = testLine;
-            }
-        });
-        
-        // Dibujar última línea
-        if (currentLine) {
-            ctx.strokeText(currentLine.toUpperCase(), textX, textY);
-            ctx.fillText(currentLine.toUpperCase(), textX, textY);
-        }
+    .container {
+        padding: 15px;
     }
 }
 
-// Función para pantalla (usa función unificada)
-function drawText() {
-    drawTextUnified(ctx, 1);
+@media (max-width: 640px) {
+    .title {
+        font-size: 1.3rem; /* ✅ Más pequeño para móvil con texto largo */
+    }
+    
+    .subtitle {
+        font-size: 0.9rem;         /* Tamaño más pequeño */
+        padding: 0 15px;           /* Más padding en móvil */
+        line-height: 1.5;          /* Mejor espaciado */
+        max-width: 95%;            /* Usar más ancho en móvil */
+    }
+    
+    /* ✅ CONTADORES RESPONSIVE MÓVIL */
+    .stats-container {
+        gap: 10px;
+        margin: 5px 0;
+    }
+    
+    .stat-icon {
+        width: 10px;
+        height: 10px;
+    }
+    
+    .stat-number {
+        font-size: 0.7rem;
+    }
+    
+    .form-section {
+        padding: 20px;
+    }
+    
+    .upload-area {
+        padding: 30px 15px;
+    }
+    
+    .main-canvas {
+        max-height: 400px;
+    }
+    
+
 }
 
-function getDanceText() {
-    if (appState.selectedDance === 'otro' && appState.otherDance.trim()) {
-        return appState.otherDance.trim();
-    } else if (appState.selectedDance && appState.selectedDance !== 'otro') {
-        return appState.selectedDance;
+/* Responsive extra para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    .title {
+        font-size: 1rem; /* ✅ Muy pequeño para pantallas pequeñas */
+        letter-spacing: 0.5px;
+        line-height: 1.2;
+        padding: 0 10px;
     }
-    return '';
+    
+    .subtitle {
+        font-size: 0.85rem;
+        padding: 0 10px;
+        line-height: 1.6;
+    }
+    
+    .container {
+        padding: 10px;
+    }
+    
+    .intro-content {
+        padding: 30px 20px;
+        margin: 10px;
+    }
+    
+    .intro-title {
+        font-size: 1.5rem;
+    }
+    
+    .intro-text {
+        font-size: 1rem;
+    }
 }
 
-function updateDownloadButton() {
-    const downloadBtn = document.getElementById('downloadBtn');
-    const hasRequiredData = appState.fullName.trim() && 
-                           (appState.selectedDance && appState.selectedDance !== '') &&
-                           (appState.selectedDance !== 'otro' || appState.otherDance.trim()) &&
-                           appState.imageLoaded;
-    
-    downloadBtn.disabled = !hasRequiredData;
+/* Estados especiales */
+.upload-area.dragover {
+    border-color: var(--secondary-color);
+    background: rgba(178, 34, 34, 0.1);
 }
 
-function downloadImage() {
-    if (!appState.imageLoaded) {
-        alert('Por favor, carga una imagen primero.');
-        return;
-    }
-    
-    if (!appState.fullName.trim()) {
-        alert('Por favor, ingresa tu nombre y apellido.');
-        return;
-    }
-    
-    if (!appState.selectedDance) {
-        alert('Por favor, selecciona una danza.');
-        return;
-    }
-    
-    if (appState.selectedDance === 'otro' && !appState.otherDance.trim()) {
-        alert('Por favor, especifica el nombre de la danza.');
-        return;
-    }
-    
-    // Crear canvas de alta resolución
-    const finalCanvas = document.createElement('canvas');
-    const finalCtx = finalCanvas.getContext('2d');
-    const finalSize = 2000;
-    
-    finalCanvas.width = finalSize;
-    finalCanvas.height = finalSize;
-    
-    // Escalar todos los elementos proporcionalmente
-    const scaleFactor = finalSize / canvasWidth;
-    
-    // Fondo
-    const gradient = finalCtx.createLinearGradient(0, 0, finalSize, finalSize);
-    gradient.addColorStop(0, '#F8F6F0');
-    gradient.addColorStop(1, '#E8E6E0');
-    finalCtx.fillStyle = gradient;
-    finalCtx.fillRect(0, 0, finalSize, finalSize);
-    
-    // Imagen del usuario escalada
-    if (userImage) {
-        finalCtx.drawImage(
-            userImage,
-            imageX * scaleFactor,
-            imageY * scaleFactor,
-            userImage.width * imageScale * scaleFactor,
-            userImage.height * imageScale * scaleFactor
-        );
-    }
-    
-    // Marco escalado
-    if (frameImage) {
-        finalCtx.drawImage(frameImage, 0, 0, finalSize, finalSize);
-    }
-    
-    // Texto escalado
-    drawTextOnCanvas(finalCtx, scaleFactor);
-    
-    // Generar nombre del archivo
-    const randomNumber = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    const fileName = `SERGIO_VARGAS_GESTION_FUL_USFX_NACER_${randomNumber}.png`;
-    
-    // Descargar
-    finalCanvas.toBlob(function(blob) {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        // Redirección automática
-        setTimeout(() => {
-            window.open('https://docs.google.com/forms/d/e/1FAIpQLSeTfMtTzWq7LVPUl8tJ5lIt2DnlISnz192LWabErIw70FN-wA/viewform?usp=header', '_blank');
-        }, 1000);
-    }, 'image/png');
+.form-input.error,
+.form-select.error {
+    border-color: #ff4444;
+    background-color: rgba(255, 68, 68, 0.05);
 }
 
-f// Función para descarga (usa función unificada)
-function drawTextOnCanvas(ctx, scaleFactor) {
-    drawTextUnified(ctx, scaleFactor);
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-// Event listeners adicionales para actualizar el botón de descarga
-document.getElementById('fullName').addEventListener('input', updateDownloadButton);
-document.getElementById('danceSelect').addEventListener('change', updateDownloadButton);
-document.getElementById('otherDance').addEventListener('input', updateDownloadButton);
+.form-group {
+    animation: fadeIn 0.6s ease forwards;
+}
+
+.form-group:nth-child(1) { animation-delay: 0.1s; }
+.form-group:nth-child(2) { animation-delay: 0.2s; }
+.form-group:nth-child(3) { animation-delay: 0.3s; }
+.form-group:nth-child(4) { animation-delay: 0.4s; }
+
+/* Loading state */
+.loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Mensaje flotante de introducción */
+.intro-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.intro-modal.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.intro-content {
+    background: linear-gradient(135deg, #FFD700 0%, #FF6B6B 50%, #4ECDC4 100%);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 500px;
+    margin: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 3px solid #FFFFFF;
+}
+
+.intro-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #FFFFFF;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.intro-text {
+    font-size: 1.1rem;
+    color: #FFFFFF;
+    margin-bottom: 30px;
+    line-height: 1.6;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.intro-btn {
+    background: #228B22;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.intro-btn:hover {
+    background: #32CD32;
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(0,0,0,0.4);
+}
+
+/* ✅ SECCIÓN DE IMAGEN INFERIOR */
+.bottom-image-section {
+    margin-top: 40px;
+    width: 100%;
+    background: #111111;
+    padding: 0;
+    border-top: 2px solid #333333;
+}
+
+.bottom-image-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.bottom-banner-image {
+    width: 100%; /* ✅ ANCHO COMPLETO DE LA PÁGINA */
+    height: 200px; /* ✅ ALTURA FIJA 200px */
+    object-fit: cover;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+/* Responsive para imagen inferior */
+@media (max-width: 640px) {
+    .bottom-image-section {
+        margin-top: 20px;
+    }
+    
+    .bottom-banner-image {
+        height: 150px; /* ✅ ALTURA REDUCIDA EN MÓVIL */
+    }
+}
