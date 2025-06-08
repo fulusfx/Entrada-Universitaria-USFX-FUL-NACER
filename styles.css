@@ -46,9 +46,9 @@ body {
 }
 
 .title {
-    font-size: 4rem; /* ✅ Reducido ligeramente para texto largo */
+    font-size: 5rem; /* ✅ Reducido ligeramente para texto largo */
     font-weight: 700;
-    font-family: 'Anton', sans-serif; /* ✅ FUENTE ANTON */
+    font-family: 'Poppins', sans-serif; /* ✅ FUENTE ANTON */
     margin-bottom: 10px;
     letter-spacing: 1.5px; /* ✅ Espaciado reducido */
     color: #FFFFFF; /* ✅ COLOR BLANCO SIMPLE */
